@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css" type="text/css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel ="icon" href="top_icon.png"/>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        
+    </head>
+    <body>
+        <div class="maindiv">
+		
+            <div class="headdiv">
+                <a href ="smartgaragepanel.html"><img class="logo" src="top_icon.png" alt="Görsel bulunamadı." width="140px" ></a>
+                <h1>Smart Parking System</h1>
+                <div id="alert-div">
+                    
+                </div>
+            </div>
+                      
+            <div class="menudiv">
+            <ul class="ul">
+                    <li><a href="#">About Project</a></li>
+                    <li><a href="#">Gallery</a></li>
+                    <li><a href="smartgaragepanel.html">Home Page</a></li>
+                   <!-- <li><a href="index.php">Home Page</a></li>-->
+            </ul>
+            </div>
+            
+            <div class="buttondiv" style="height: 560px; width: 40%; float:left">
+                <img src="pics/araba.PNG" style= "margin-top:150px height:250px; width:100%;" alt="Görsel bulunamadı.">
+                <button id="button" type="button" onclick="go()" name="button" class="btn-success btn-lg" style="width:100%" value="go">Forward</button>
+                <button id="button" type="button" onclick="left()" name="button" class="btn-info btn-lg" style="width:32.75%" value="left">Left</button>
+                <button id="button" type="button" onclick="stop()" name="button" class="btn-danger btn-lg" style="width:32.75%" value="stop">Stop</button>
+                <button id="button" type="button" onclick="right()" name="button" class="btn-info btn-lg" style="width:32.75%" value="right">Right</button>
+                <button id="button" type="button" onclick="back()" name="button" class="btn-success btn-lg" style="width:100%" value="back">Back</button><br>
+            </div>
+            <div class="interactivesdiv">
+                
+                <!--Interactif modif J-->
+                <div class="interactive1">
+                    <h3>Distance</h3>
+                    <div class="progress" style="width:200px">
+                        <div class="progress-bar" id="progressBar" name="progressBar" role="progressbar" 
+                        aria-valuenow="40" aria-valuemin="0" aria-valuemax="20" style="">
+                        <span id="mesafe_deger">0</span>
+                        </div>
+                   
+                    </div>
+                    
+                </div> 
+    
+                <!--Interactif modif J-->
+                <div class="interactive2">
+                    <div>
+                        <h3><p>Gase: <span id="gase_value">0</span> </p></h3>
+                    </div>
+                    <h3>Air Control</h3>
+                    <div class="t_switch">
+                        <label class="switch">
+                            <input type="checkbox" id="fan_toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <h3>Fan Speed</h3>
+                    <div class="r_button">
+                        <input type="radio" id="fan_high" name="fan_speed" value='100' onclick="handleFanSpeed(this);"><label for="fan_high"> High</label><br />
+                        <input type="radio" id="fan_normal" checked="checked" name="fan_speed" value='70' onclick="handleFanSpeed(this);"/><label for="fan_normal"> Normal</label><br />
+                        <input type="radio" id="fan_low" name="fan_speed" value='40' onclick="handleFanSpeed(this);"/><label for="fan_low"> Low</label>
+                    </div>
+                </div>
+    
+                <!--Interactif modif J-->
+                <div class="interactive3">
+                    <div>
+                       <h3> <p>Light: <span id="light_value">0</span> </p> </h3>
+                    </div>
+                    <h3>Light Control</h3>
+                    <div class="t_switch">
+                        <label class="switch">
+                            <input type="checkbox" id="light_toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <h3>Light Brightness</h3>
+                    <div class="r_button">
+                        <input type="radio" id="light_high" name="led_brightness" value='60' onclick="handleLight(this);"><label for="light_high"> High</label><br />
+                        <input type="radio" id="light_normal" checked="checked" name="led_brightness" value='80' onclick="handleLight(this);"/><label for="light_normal"> Medium</label><br />
+                        <input type="radio" id="light_low" name="led_brightness" value='95' onclick="handleLight(this);"/><label for="light_low"> Low</label>
+                    </div>
+                </div>    
+            </div> 
+            <div style="height: 1px;">
+
+            </div>
+            <div class="footerdiv" style="margin-top: 800px"><h3>All rights reserved</h3><h5>Any suggestions? <a href="mailto:project.smartgarage@gmail.com?subject=Suggestion;&body=I have a suggestion for you:" style="text-decoration: none;">Contact us</a></h5></div>
+            </div>
+        </div>
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript">
+            // Function that receive sensor datas from RPi(garage)
+            function receive_data(){
+         $.ajax({
+             url:"http://smartgarageproject.com/veri_cekme.php",
+             type:"POST",
+             success:function(response){
+                 var data = JSON.parse(response);
+                 console.log(data);
+                 var gas = data.gas;
+                 var light = data.light;
+                 var mesafe = data.mesafe;
+                 if(gas==1){document.getElementById("gase_value").innerHTML = "Gase Detected";}
+                 else{document.getElementById("gase_value").innerHTML = "Gase not Detected";}
+                 document.getElementById("light_value").innerHTML = light;
+                 document.getElementById("mesafe_deger").innerHTML = mesafe;
+                 $('.progress-bar').css('width', 5*mesafe + '%');
+             },
+             complete: function() {
+               // Schedule the next request when the current one's complete
+               setTimeout(receive_data, 2000); // wait two seconds and repeat
+             },
+             cache: false
+         })
+              
+          };
+         (function start() {
+             setTimeout(receive_data, 2000); // This will work immediately after the site is opened
+         })();
+         
+         function go(){
+         var val="go";
+         var params = "val="+val;
+         var path = "/api/button";
+         sendButtonToRaspberry(path,params);
+             
+         }
+     function left(){
+         var val="left";
+         var params = "val="+val;
+         var path = "/api/button";
+         sendButtonToRaspberry(path,params);
+         
+     }
+     function stop(){
+         var val="stop";
+         var params = "val="+val;
+         var path = "/api/button";
+         sendButtonToRaspberry(path,params);
+         
+     }
+     
+     function right(){
+         var val="right";
+         var params = "val="+val;
+         var path = "/api/button";
+         sendButtonToRaspberry(path,params);
+         
+     }
+     
+     function back(){
+         var val="back";
+         var params = "val="+val;
+         var path = "/api/button";
+         sendButtonToRaspberry(path,params);
+         
+     }
+         
+       
+     
+      var alertDiv = document.getElementById("alert-div");
+    // state variables
+    // Initially all devices are turned off
+     var fan_status = 0, led_status = 0;
+     var fan_speed = 60; // fan default speed
+     var led_brightness = 80; // led default brightness
+     
+     
+     document.getElementById("light_toggle").addEventListener("change", function (e) {
+                 var action = "";
+                 if (e.target.checked) {
+                     led_status = 1;
+                     action = "on";
+                 }
+                 else{
+                     led_status = 0;
+                     action = "off";
+                 }
+                 var params = "action="+action+"&led_brightness="+led_brightness+"&led_status="+led_status;
+                 var path = "/api/led";
+                 sendToRaspberry(path,params);
+             });
+     document.getElementById("fan_toggle").addEventListener("change", function (e) {
+                 var action = "";
+                 if (e.target.checked) {
+                     fan_status = 1;
+                     action = "on";
+                 }
+                 else{
+                     fan_status = 0;
+                     action = "off";
+                 }
+                 var params = "action="+action+"&fan_speed="+fan_speed+"&fan_status="+fan_status;
+                 var path = "/api/fan";
+                 sendToRaspberry(path,params);
+             });
+     function handleFanSpeed(fanSpeed) {
+             fan_speed = fanSpeed.value;
+             var params = "action=on&fan_speed="+fan_speed+"&fan_status="+fan_status;
+             var path = "/api/fan";
+             sendToRaspberry(path,params);
+         }
+         
+     function handleLight(light) {
+             led_brightness = light.value;
+             var params = "action=on&led_brightness="+led_brightness+"&led_status="+led_status;
+             var path = "/api/led";
+             sendToRaspberry(path,params);
+         }
+      // ngrok http adress of RPi(garage)    
+      var raspberry_pi_server_url = "http://dad5-151-135-61-144.ngrok.io/";
+      // ngrok http adress of RPi(car)    
+      var raspberry_pi_button_server_url = "http://396a-151-135-61-144.ngrok.io";
+      
+      // Function that sends data to RPi(car) for device control 
+         function sendButtonToRaspberry(path,params){
+             $.ajax({
+               type : 'GET',
+               url : raspberry_pi_button_server_url+path+"?"+params,
+               success: function(msg){
+                 
+                 console.log(msg);
+               
+               },
+               error: function(xhr, status, error){
+       
+                  alertDiv.innerHTML = '<div class="alert alert-danger"> <span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span> Failed to send data!</div>';
+                  
+              }
+             });
+         }
+         // Function that sends data to RPi(garage) for device control 
+         function sendToRaspberry(path,params){
+             $.ajax({
+               type : 'GET',
+               url : raspberry_pi_server_url+path+"?"+params,
+               success: function(msg){
+                 
+                 console.log(msg);
+               
+               },
+               error: function(xhr, status, error){
+       
+                  alertDiv.innerHTML = '<div class="alert alert-danger"> <span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span> Failed to send data!</div>';
+                  
+              }
+             });
+         }
+ </script>
+        
+        
+    </body>
+</html>
